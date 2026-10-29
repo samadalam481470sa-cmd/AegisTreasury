@@ -81,3 +81,20 @@ Python • FastAPI • Pydantic • SQLite • JavaScript • HTML/CSS • Docke
 > Built AegisTreasury, a full-stack treasury operations platform with atomic double-entry ledger posting, payment-state workflows, tamper-evident event logging, liquidity forecasting and scenario stress testing, using Python, FastAPI, SQLite, JavaScript, and automated CI tests.
 
 MIT License.
+
+
+## Additional project: AegisLedger Ops (security platform)
+
+This repository also contains **[AegisLedger Ops](security-platform/README.md)**, a separate portfolio-ready cybersecurity and fintech security operations application. It includes rule-based transaction fraud alerts, suspicious activity detection, role-based accounts, CSRF protection, incident triage, audit-chain verification, synthetic infrastructure metrics, Docker and automated security checks.
+
+Run it independently:
+
+```bash
+cd security-platform
+pip install -r requirements-dev.txt
+python -m app.manage init-admin --email you@example.com
+python -m app.manage seed-demo
+uvicorn app.main:app --reload
+```
+
+This security module is a local educational simulation, not a live financial security service. See its [security policy](security-platform/SECURITY.md).

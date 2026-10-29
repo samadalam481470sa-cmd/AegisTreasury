@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#081321" />
+  <meta name="description" content="AegisLedger Ops — security operations, financial fraud risk and engineering visibility." />
+  <title>AegisLedger Ops | Security Intelligence</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+<div id="login-screen" class="login-screen hidden">
+  <div class="login-glow"></div>
+  <form id="login-form" class="login-card">
+    <div class="brand-symbol">◈</div>
+    <p class="eyebrow">SECURITY INTELLIGENCE PLATFORM</p>
+    <h1>Welcome to <span>AegisLedger.</span></h1>
+    <p class="muted">Authenticate to access the unified security operations console.</p>
+    <label for="email">Email address</label><input id="email" type="email" placeholder="admin@yourcompany.com" autocomplete="username" required />
+    <label for="password">Password</label><input id="password" type="password" placeholder="••••••••••••" autocomplete="current-password" required />
+    <button type="submit" class="primary full">Secure sign in <span>→</span></button>
+    <div id="login-error" class="form-error" role="alert"></div>
+    <p class="small-note">New installation? Create an admin through the command line. No default account or password is provided.</p>
+  </form>
+</div>
+<div id="app-shell" class="shell hidden">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-symbol">◈</div><div><strong>AEGIS<span>LEDGER</span></strong><small>OPS CONSOLE <i class="brand-dot"></i></small></div></div>
+    <div class="nav-label">WORKSPACE</div>
+    <nav aria-label="Main navigation">
+      <button class="nav-link active" data-view="overview"><span class="nav-icon">▦</span> Overview</button>
+      <button class="nav-link" data-view="alerts"><span class="nav-icon">◇</span> Threat intelligence <span class="nav-pill" id="alert-nav-count">0</span></button>
+      <button class="nav-link" data-view="events"><span class="nav-icon">⇄</span> Event explorer</button>
+      <button class="nav-link" data-view="services"><span class="nav-icon">▤</span> Infrastructure</button>
+      <button class="nav-link admin-only" data-view="audit"><span class="nav-icon">⊞</span> Audit integrity</button>
+    </nav>
+    <div class="sidebar-spacer"></div>
+    <div class="workspace-status"><span class="status-pulse"></span><div><strong>Demo environment</strong><small>Synthetic data only</small></div></div>
+    <div class="sidebar-footer"><div class="avatar" id="user-avatar">U</div><div class="identity"><strong id="user-email">—</strong><small id="user-role">—</small></div><button class="icon-button" id="logout" title="Sign out" aria-label="Sign out">⎋</button></div>
+  </aside>
+  <div class="main-column">
+    <header class="topbar"><div class="breadcrumb"><span>WORKSPACE</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Overview</strong></div><div class="top-actions"><span class="top-separator"></span><span class="live-dot"></span><span class="live-text">SYSTEM MONITORING ACTIVE</span><span class="version">v1.0</span></div></header>
+    <main class="content">
+      <div class="page-heading"><div><p class="eyebrow" id="page-eyebrow">SECURITY OVERVIEW</p><h1 id="page-title">Intelligence Overview</h1><p class="page-description" id="page-description">Monitor security signals, financial risk and infrastructure health in one place.</p></div><div class="heading-actions"><span class="clock-label">LAST SYNC <strong id="last-sync">—</strong></span><button id="refresh" class="outline-button">↻ &nbsp; Refresh</button></div></div>
+      <div id="error-banner" class="error-banner hidden" role="alert"></div>
+      <section id="view-overview" class="view active">
+        <div class="metrics-grid">
+          <article class="metric-card"><div class="metric-label"><span>TOTAL EVENTS</span><span class="metric-symbol blue">⇄</span></div><div class="metric-value" id="kpi-events">—</div><div class="metric-caption"><span class="metric-tag">LIVE</span> All monitored activity</div></article>
+          <article class="metric-card"><div class="metric-label"><span>ACTIVE ALERTS</span><span class="metric-symbol orange">◇</span></div><div class="metric-value" id="kpi-alerts">—</div><div class="metric-caption"><span class="metric-tag warning">ATTENTION</span> Open investigations</div></article>
+          <article class="metric-card"><div class="metric-label"><span>AVERAGE RISK SCORE</span><span class="metric-symbol purple">◎</span></div><div class="metric-value" id="kpi-risk">—<small>/100</small></div><div class="metric-caption"><span class="metric-tag">RULE BASED</span> Explainable scoring</div></article>
+          <article class="metric-card"><div class="metric-label"><span>HEALTHY SERVICES</span><span class="metric-symbol green">▣</span></div><div class="metric-value" id="kpi-services">—</div><div class="metric-caption"><span class="metric-tag">OPS</span> Live status snapshot</div></article>
+        </div>
+        <div class="analytics-grid">
+          <article class="panel activity-panel"><div class="panel-header"><div><h2>Security event activity</h2><p>Event ingestion trend</p></div><span class="panel-chip">7 DAY VIEW</span></div><svg id="activity-chart" viewBox="0 0 630 210" preserveAspectRatio="none" aria-label="Recent event activity" role="img"></svg><div class="chart-legend"><span class="legend-dot"></span> Recorded events <span class="chart-note">Events added through the API and simulator</span></div></article>
+          <article class="panel threat-panel"><div class="panel-header"><div><h2>Threat distribution</h2><p>Alert severity breakdown</p></div><span class="panel-chip">SEVERITY</span></div><div class="threat-content"><div class="ring" id="severity-ring"><div class="ring-middle"><b id="ring-total">0</b><span>TOTAL</span></div></div><div id="severity-list" class="severity-list"></div></div></article>
+        </div>
+        <article class="panel table-panel"><div class="panel-header"><div><h2>Recent threat detections</h2><p>Latest alerts requiring review</p></div><button class="text-button" data-jump="alerts">View all alerts &nbsp; →</button></div><div class="table-wrap"><table><thead><tr><th>ALERT</th><th>SOURCE / ENTITY</th><th>SEVERITY</th><th>STATUS</th><th>TIME</th></tr></thead><tbody id="overview-alerts"></tbody></table></div></article>
+      </section>
+      <section id="view-alerts" class="view"><article class="panel table-panel"><div class="panel-header"><div><h2>Security alert queue</h2><p>Review, triage and resolve suspicious activity</p></div><span class="panel-chip">ROLE-GATED ACTIONS</span></div><div class="table-wrap"><table><thead><tr><th>DETECTION</th><th>ACTOR</th><th>RISK</th><th>SEVERITY</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody id="alerts-table"></tbody></table></div></article></section>
+      <section id="view-events" class="view"><div class="section-toolbar"><div class="filters" role="group" aria-label="Event category filter"><button class="filter-btn selected" data-filter="all">All events</button><button class="filter-btn" data-filter="fintech">Fintech</button><button class="filter-btn" data-filter="cybersecurity">Cybersecurity</button><button class="filter-btn" data-filter="infrastructure">Infrastructure</button></div><button class="primary writer-only" id="show-simulator">+ Simulate event</button></div><article class="panel table-panel"><div class="panel-header"><div><h2>Event telemetry</h2><p>API-ingested signals, risk scores and detection rules</p></div><span class="panel-chip">LAST 200</span></div><div class="table-wrap"><table><thead><tr><th>ID / CATEGORY</th><th>EVENT TYPE</th><th>ACTOR / SOURCE</th><th>RESOURCE</th><th>RISK</th><th>TIME</th></tr></thead><tbody id="events-table"></tbody></table></div></article></section>
+      <section id="view-services" class="view"><div class="section-intro"><h2>Service reliability</h2><p>Illustrative operating metrics seeded for local demo; no cloud integration is configured.</p></div><div id="services-grid" class="service-grid"></div></section>
+      <section id="view-audit" class="view"><article class="integrity-banner"><div class="integrity-icon">⬡</div><div><h2>Cryptographic audit verification</h2><p>Verify a chained SHA-256 digest for each recorded action. Detects accidental or unsophisticated tampering; not an immutable external ledger.</p></div><button class="primary" id="verify-chain">Verify audit chain</button></article><div id="integrity-result" class="integrity-result"></div><article class="panel table-panel"><div class="panel-header"><div><h2>Audit timeline</h2><p>Authenticated actions and event ingestion history</p></div><span class="panel-chip">ADMIN ONLY</span></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>ACTION</th><th>ACTOR</th><th>ENTITY</th><th>HASH PREFIX</th><th>TIME</th></tr></thead><tbody id="audit-table"></tbody></table></div></article></section>
+      <footer class="page-footer"><span>© AegisLedger Ops · Educational security portfolio project</span><span>NO LIVE FINANCIAL DATA · RULE-BASED DETECTION</span></footer>
+    </main>
+  </div>
+</div>
+<div id="simulator-modal" class="modal-layer hidden"><div class="modal-backdrop" id="close-backdrop"></div><form class="modal-card" id="simulator-form"><div class="modal-header"><div><p class="eyebrow">SANDBOX SIMULATOR</p><h2>Inject a synthetic event</h2></div><button type="button" class="icon-button" id="close-simulator" aria-label="Close">×</button></div><p class="muted">Send a local test signal through the same API and risk engine as other events.</p><label for="event-kind">Scenario</label><select id="event-kind"><option value="large_transfer">High-value transfer + new payee</option><option value="malware">Malware on a workstation</option><option value="unauthorized">Unauthorized secret-store access</option><option value="chargeback">Disputed payment</option><option value="normal">Routine card payment</option></select><label for="event-actor">Synthetic actor name</label><input id="event-actor" type="text" value="test_customer_001" minlength="2" maxlength="100" required /><button class="primary full" type="submit">Run security simulation &nbsp; →</button><div id="simulator-result" class="simulation-result"></div></form></div>
+</body></html>
