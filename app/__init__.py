@@ -1,0 +1,1 @@
+"""AegisTreasury application package."""
