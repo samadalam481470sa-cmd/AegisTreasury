@@ -16,7 +16,8 @@ from .audit import append_audit, verify_chain
 from .db import connect, init_db
 from .risk import evaluate
 from .security import (check_csrf, hash_value, issue_session, load_session, now,
-                       record_failure, too_many_attempts, verify_password)
+                       record_failure, too_many_attempts, verify_password,
+                       waste_verify_time)
 
 ROOT = Path(__file__).resolve().parent.parent
 COOKIE_SECURE = os.getenv("AEGIS_HTTPS_ONLY", "false").lower() == "true"
@@ -39,6 +40,9 @@ async def secure_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=(), payment=()"
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
     response.headers["Content-Security-Policy"] = ("default-src 'self'; script-src 'self'; style-src 'self'; "
                                                    "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; "
                                                    "object-src 'none'; base-uri 'self'; form-action 'self'")
@@ -197,9 +201,14 @@ def login(payload: Login, request: Request, response: Response, db=Depends(get_d
     if too_many_attempts(db, identity):
         raise HTTPException(429, "Too many attempts; try again in 15 minutes")
     user = db.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
-    if not user or not verify_password(user["password_hash"], payload.password):
+    if not user:
+        waste_verify_time(payload.password)
         record_failure(db, identity)
         db.commit()  # persist failed attempts even though the request returns 401
+        raise HTTPException(401, "Invalid credentials")
+    if not verify_password(user["password_hash"], payload.password):
+        record_failure(db, identity)
+        db.commit()
         raise HTTPException(401, "Invalid credentials")
     db.execute("DELETE FROM login_attempts WHERE identity=?", (identity,))
     token, csrf = issue_session(db, user["id"])

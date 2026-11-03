@@ -55,6 +55,32 @@ def test_audit_integrity(client):
         db.commit()
     assert client.get('/api/audit').json()['valid'] is False
 
+def test_security_headers(client):
+    for path in ('/', '/api/health'):
+        headers = client.get(path).headers
+        assert "script-src 'self'" in headers['content-security-policy']
+        assert headers['x-content-type-options'] == 'nosniff'
+        assert headers['x-frame-options'] == 'DENY'
+    assert client.get('/api/health').headers['cache-control'] == 'no-store'
+
+
+def test_write_limit_rejects_floods(client):
+    from app import api
+    api._write_log.clear()
+    api.WRITE_LIMIT, original = 2, api.WRITE_LIMIT
+    try:
+        body = {'reference': 'RL-1', 'counterparty': 'Rate', 'amount_cents': 100,
+                'source_account_id': 1, 'destination_account_id': 2}
+        assert client.post('/api/payments', json=body).status_code == 201
+        body['reference'] = 'RL-2'
+        assert client.post('/api/payments', json=body).status_code == 201
+        body['reference'] = 'RL-3'
+        assert client.post('/api/payments', json=body).status_code == 429
+    finally:
+        api.WRITE_LIMIT = original
+        api._write_log.clear()
+
+
 def test_validation_and_page(client):
     assert 'text/html' in client.get('/').headers['content-type']
     assert client.post('/api/payments',json={'reference':'xx'}).status_code==422

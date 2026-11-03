@@ -70,7 +70,7 @@ Browser (HTML/CSS/JS)
 
 ## Security and limitations
 
-**Do not deploy this demo publicly as is.** There is no authentication, authorization, access control, multi-user separation, request throttling, or secure operational key management. Seeded balances and counterparties are fictional. There are no bank integrations, funds transfers, real-time market feeds, or regulatory compliance claims. API inputs are validated, but this is educational software, not production-grade banking infrastructure. The scenario forecast assumes constant daily cash flows and is not a predictive model. For production, add role-based auth, approvals with separation of duties, PostgreSQL, migrations, encryption, backups, idempotency keys, monitoring, and immutable external audit retention.
+**Do not deploy this demo publicly as is.** There is no authentication, authorization, access control, multi-user separation or secure operational key management. What the API does enforce: a strict Content-Security-Policy and the usual anti-framing/`nosniff`/no-referrer headers, `no-store` on API responses, bounded Pydantic request models, integer-cent amounts, parameterised SQL, one managed database connection per request (always closed), and a per-client write budget (`AEGIS_WRITE_LIMIT`, default 120 writes/minute, HTTP 429 when exceeded). Seeded balances and counterparties are fictional. There are no bank integrations, funds transfers, real-time market feeds, or regulatory compliance claims. API inputs are validated, but this is educational software, not production-grade banking infrastructure. The scenario forecast assumes constant daily cash flows and is not a predictive model. For production, add role-based auth, approvals with separation of duties, PostgreSQL, migrations, encryption, backups, idempotency keys, monitoring, and immutable external audit retention.
 
 ## Tech stack
 
@@ -98,3 +98,11 @@ uvicorn app.main:app --reload
 ```
 
 This security module is a local educational simulation, not a live financial security service. See its [security policy](security-platform/SECURITY.md).
+
+## Security, licensing and legal notices
+
+- [SECURITY.md](SECURITY.md) — threat model, controls, known limitations and how to report a vulnerability.
+- [LEGAL.md](LEGAL.md) — usage disclaimers, trademark notes and what an owner must verify before publishing.
+- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) — dependency licences (all permissive) and the audit commands.
+
+MIT licensed, provided as-is with no warranty. Nothing here is financial, security or legal advice.

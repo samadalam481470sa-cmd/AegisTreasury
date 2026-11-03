@@ -1,7 +1,16 @@
 __pycache__/
 .pytest_cache/
-*.pyc
+.ruff_cache/
+*.py[cod]
 *.db
 *.db-*
+*.sqlite3
+data/
 .env
+.env.*
+!.env.example
 .venv/
+venv/
+coverage/
+htmlcov/
+.DS_Store

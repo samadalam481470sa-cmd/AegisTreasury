@@ -7,6 +7,9 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError
 
 ph = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=2)
+# Verified against for unknown accounts so a failed login costs the same time whether
+# or not the email exists (prevents account enumeration by response timing).
+_DUMMY_HASH = ph.hash(secrets.token_urlsafe(32))
 SESSION_HOURS = 8
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_MINUTES = 15
@@ -33,9 +36,20 @@ def verify_password(encoded: str, password: str):
         return False
 
 
+def waste_verify_time(password: str) -> None:
+    """Burn one Argon2 verification so timing does not reveal missing accounts."""
+    try:
+        ph.verify(_DUMMY_HASH, password)
+    except Exception:
+        pass
+
+
 def issue_session(db, user_id):
     token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
     expiry = (datetime.now(timezone.utc) + timedelta(hours=SESSION_HOURS)).isoformat()
+    # Opportunistic cleanup so expired rows cannot accumulate without bound.
+    db.execute("DELETE FROM sessions WHERE expires_at <= ?",
+               (datetime.now(timezone.utc).replace(microsecond=0).isoformat(),))
     db.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
     db.execute("INSERT INTO sessions(token_hash,user_id,csrf_hash,expires_at) VALUES(?,?,?,?)",
                (hash_value(token), user_id, hash_value(csrf), expiry))

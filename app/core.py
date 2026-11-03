@@ -132,7 +132,8 @@ def transition_payment(conn,payment_id,new_status):
             raise DomainError('Invalid payment status transition')
         if new_status=='settled':
             amount=payment['amount_cents']
-            available=next(x['balance_cents'] for x in accounts(conn) if x['id']==payment['source_account_id'])
+            balances={x['id']:x['balance_cents'] for x in accounts(conn)}
+            available=balances.get(payment['source_account_id'],0)
             if available<amount:
                 raise DomainError('Insufficient available balance')
             cur=conn.execute('INSERT INTO journals(reference,description) VALUES(?,?)',('PAY-'+payment['reference'],'Payment settlement'))
